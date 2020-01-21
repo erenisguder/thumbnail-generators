@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const fs = require('fs');
+const Jimp = require('jimp');
+const puppeteer = require('puppeteer');
+const httpServer = require("http-server");
+const dir = process.cwd();
+
+const server = httpServer.createServer({
+  root: dir,
+  cache: -1
+});
+
+server.listen(7090, function () {
+  let jobs =
+    fs.readdirSync(dir, {
+      withFileTypes: true
+    })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+  const work = async (file) => {
+    let browser;
+    try {
+      browser = await puppeteer.launch();
+      const page = await browser.newPage();
+
+      await page.goto('http://localhost:7090/' + file + "/index.html", {
+        "waitUntil": "load"
+      });
+
+      await page.waitFor(1000);
+
+      await page.screenshot({
+        path: dir + "/" + file + '/media/images/thumbnails/200x150.jpg',
+        type: "jpeg",
+        clip: {
+          x: 0,
+          y: 0,
+          width: 1024,
+          height: 768
+        }
+      });
+
+      const img = await Jimp.read(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
+      await img.resize(200, 150).write(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
+
+      console.log(file);
+      browser.close();
+    } catch (err) {
+      console.log("---");
+      console.log("ERROR: " + err.message);
+      console.log("---");
+    } finally {
+      if (browser) {
+        browser.close();
+      }
+
+      if (jobs.length) {
+        work(jobs.pop());
+      } else {
+        setTimeout(() => {
+          process.exit();
+        }, 0);
+      }
+    }
+  };
+
+  work(jobs.pop());
+});

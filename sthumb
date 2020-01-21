@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const fs = require('fs');
+const Jimp = require('jimp');
+const puppeteer = require('puppeteer');
+const httpServer = require("http-server");
+const dir = process.cwd();
+
+const server = httpServer.createServer({
+  root: dir,
+  cache: -1
+});
+
+server.listen(7090, function () {
+  let jobs =
+    fs.readdirSync(dir, {
+      withFileTypes: true
+    })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+  jobs = jobs.filter(item => item !== "shared");
+
+  const work = async (file) => {
+    let browser;
+    try {
+      browser = await puppeteer.launch();
+      const page = await browser.newPage();
+
+      await page.goto('http://localhost:7090/' + file + "/" + file + ".html", {
+        "waitUntil": "load"
+      });
+
+      await page.waitFor(1000);
+
+      await page.screenshot({
+        path: dir + "/" + file + '/' + file + '-full.jpg',
+        type: "jpeg",
+        clip: {
+          x: 0,
+          y: 0,
+          width: 1024,
+          height: 768
+        }
+      });
+
+      const img = await Jimp.read(dir + "/" + file + '/' + file + '-full.jpg');
+      await img.resize(200, 150).write(dir + "/" + file + '/' + file + '-thumb.jpg');
+
+      browser.close();
+      console.log(file);
+    } catch (err) {
+      console.log("---");
+      console.log("ERROR: " + err.message);
+      console.log("---");
+    } finally {
+      if (browser) {
+        browser.close();
+      }
+
+      if (jobs.length) {
+        work(jobs.pop());
+      } else {
+        setTimeout(() => {
+          process.exit();
+        }, 0);
+      }
+    }
+  };
+
+  work(jobs.pop());
+});

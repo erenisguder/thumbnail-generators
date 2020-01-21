@@ -1,0 +1,24 @@
+{
+  "name": "thumbnail-generators",
+  "version": "1.0.0",
+  "description": "A NodeJS command-line script that generates a thumbnail for Veeva and MI sequences",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erenisguder/thumbnail-generators.git"
+  },
+  "keywords": [
+    "javascript",
+    "node",
+    "veeva",
+    "mi",
+    "thumbnail",
+    "generator"
+  ],
+  "author": "Eren İşgüder <erenisguder@gmail.com>",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "http-server": "^0.11.1",
+    "jimp": "^0.2.28",
+    "puppeteer": "^1.15.0"
+  }
+}
