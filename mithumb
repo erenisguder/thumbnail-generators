@@ -6,6 +6,7 @@ const fs = require('fs');
 const Jimp = require('jimp');
 const puppeteer = require('puppeteer');
 const httpServer = require("http-server");
+const imagesToPdf = require("images-to-pdf");
 const dir = process.cwd();
 
 const server = httpServer.createServer({
@@ -45,6 +46,7 @@ server.listen(7090, function () {
       });
 
       const img = await Jimp.read(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
+      await imagesToPdf([dir + "/" + file + '/media/images/thumbnails/200x150.jpg'], dir + "/" + file + '/export/export.pdf');
       await img.resize(200, 150).write(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
 
       console.log(file);
