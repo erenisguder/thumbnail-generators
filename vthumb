@@ -33,7 +33,7 @@ server.listen(7090, function () {
         "waitUntil": "load"
       });
 
-      await page.waitFor(1000);
+      await page.waitFor(2000);
 
       await page.screenshot({
         path: dir + "/" + file + '/thumb.png',
@@ -65,7 +65,7 @@ server.listen(7090, function () {
       } else {
         setTimeout(() => {
           process.exit();
-        }, 0);
+        }, 1000);
       }
     }
   };
