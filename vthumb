@@ -8,6 +8,16 @@ const puppeteer = require('puppeteer');
 const httpServer = require("http-server");
 const dir = process.cwd();
 
+var args = process.argv.slice(2)
+  .map(arg => arg.split('='))
+  .reduce((args, [value, key]) => {
+    args[value] = key;
+    return args;
+  }, {});;
+
+const WIDTH = parseInt(args.w) || 1024;
+const HEIGHT = parseInt(args.h) || 768;
+
 const server = httpServer.createServer({
   root: dir,
   cache: -1
@@ -28,6 +38,7 @@ server.listen(7090, function () {
     try {
       browser = await puppeteer.launch();
       const page = await browser.newPage();
+      await page.setViewport({ width: WIDTH, height: HEIGHT });
 
       await page.goto('http://localhost:7090/' + file, {
         "waitUntil": "load"
@@ -41,8 +52,8 @@ server.listen(7090, function () {
         clip: {
           x: 0,
           y: 0,
-          width: 1024,
-          height: 768
+          width: WIDTH,
+          height: HEIGHT
         }
       });
 
