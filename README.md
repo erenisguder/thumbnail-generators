@@ -1,14 +1,28 @@
-# Thumnail Generators for Veeva And MI
+# VThumb - Veeva and MI Thumbnail Generation Script
 
-A NodeJS command-line script that generates a thumbnail for Veeva and MI sequences
+This Node.js script automatically generates thumbnails for Veeva and MI packages in the current directory. The script scans Veeva and MI packages in the directory, opens each as a web page, captures an image, resizes it, and saves it as a thumbnail using libraries such as Puppeteer and Jimp.
 
-### Installation
+## Usage
 
-sh install.sh
+1. Clone this project or download the script to your computer.
 
-### Run
+2. To run the script, use the following command:
 
-Run the NodeJS command line file as a normal script on Linux and Mac OS X.
+   sh install.sh
 
-Example: sthumb 
-With arguments: sthumb w=1336 h=1024 (Default Width: 1024px, Height: 768px)
+Example usage:
+
+vthumb (Veeva)
+sthumb (Veeva)
+mithumb (MI)
+
+This commands will scan Veeva and MI packages in the current directory and create a thumbnail for each package.
+
+Parameters
+
+You can use the following parameters when running the script:
+
+    -w: Specifies the width of the created thumbnails (default: 1024).
+    -h: Specifies the height of the created thumbnails (default: 768).
+
+    vthumb -w=800 -h=600

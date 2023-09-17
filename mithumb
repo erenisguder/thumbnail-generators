@@ -10,76 +10,83 @@ const imagesToPdf = require("images-to-pdf");
 const dir = process.cwd();
 
 var args = process.argv.slice(2)
-  .map(arg => arg.split('='))
-  .reduce((args, [value, key]) => {
-    args[value] = key;
-    return args;
-  }, {});;
+	.map(arg => arg.split('='))
+	.reduce((args, [value, key]) => {
+		args[value] = key;
+		return args;
+	}, {});;
 
 const WIDTH = parseInt(args.w) || 1024;
 const HEIGHT = parseInt(args.h) || 768;
 
+const THUMB_WIDTH = parseInt(args.t_w) || 400;
+const THUMB_HEIGHT = parseInt(args.t_h) || 300;
+
 const server = httpServer.createServer({
-  root: dir,
-  cache: -1
+	root: dir,
+	cache: -1
 });
 
 server.listen(7090, function () {
-  let jobs =
-    fs.readdirSync(dir, {
-      withFileTypes: true
-    })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+	let jobs =
+		fs.readdirSync(dir, {
+			withFileTypes: true
+		})
+			.filter(dirent => dirent.isDirectory())
+			.map(dirent => dirent.name);
 
-  const work = async (file) => {
-    let browser;
-    try {
-      browser = await puppeteer.launch();
-      const page = await browser.newPage();
-      await page.setViewport({ width: WIDTH, height: HEIGHT });
+	const work = async (file) => {
+		let browser;
+		try {
+			browser = await puppeteer.launch();
+			const page = await browser.newPage();
+			await page.setViewport({ width: WIDTH, height: HEIGHT });
 
-      await page.goto('http://localhost:7090/' + file + "/index.html", {
-        "waitUntil": "load"
-      });
+			await page.goto('http://localhost:7090/' + file + "/index.html", {
+				"waitUntil": "load"
+			});
 
-      await page.waitFor(2000);
+			await page.waitFor(1000);
 
-      await page.screenshot({
-        path: dir + "/" + file + '/media/images/thumbnails/200x150.jpg',
-        type: "jpeg",
-        clip: {
-          x: 0,
-          y: 0,
-          width: WIDTH,
-          height: HEIGHT
-        }
-      });
+			await page.screenshot({
+				path: dir + "/" + file + '/media/images/thumbnails/200x150.jpg',
+				type: "jpeg",
+				clip: {
+					x: 0,
+					y: 0,
+					width: WIDTH,
+					height: HEIGHT
+				}
+			});
 
-      const img = await Jimp.read(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
-      await imagesToPdf([dir + "/" + file + '/media/images/thumbnails/200x150.jpg'], dir + "/" + file + '/export/export.pdf');
-      await img.resize(200, 150).write(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
+			if (!fs.existsSync(dir + "/" + file + '/export')) {
+				fs.mkdirSync(dir + "/" + file + '/export');
+			}
 
-      console.log(file);
-      browser.close();
-    } catch (err) {
-      console.log("---");
-      console.log("ERROR: " + err.message);
-      console.log("---");
-    } finally {
-      if (browser) {
-        browser.close();
-      }
+			const img = await Jimp.read(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
+			await imagesToPdf([dir + "/" + file + '/media/images/thumbnails/200x150.jpg'], dir + "/" + file + '/export/export.pdf');
+			await img.resize(THUMB_WIDTH, THUMB_HEIGHT).write(dir + "/" + file + '/media/images/thumbnails/200x150.jpg');
 
-      if (jobs.length) {
-        work(jobs.pop());
-      } else {
-        setTimeout(() => {
-          process.exit();
-        }, 1000);
-      }
-    }
-  };
+			console.log(file);
+			browser.close();
+		} catch (err) {
+			console.log("---");
+			console.log("ERROR: " + err.message);
+			console.log("---");
+		} finally {
+			if (browser) {
+				browser.close();
+			}
 
-  work(jobs.pop());
+			if (jobs.length) {
+				work(jobs.pop());
+			} else {
+				setTimeout(() => {
+					process.exit();
+				}, 1000);
+			}
+		}
+	};
+
+	work(jobs.pop());
 });
