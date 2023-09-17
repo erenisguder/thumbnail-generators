@@ -1,4 +1,4 @@
-# Thumbnail Generators - Veeva and MI Thumbnail Generation Script
+# Veeva and MI Thumbnail Generation Script
 
 This Node.js script automatically generates thumbnails for Veeva and MI packages in the current directory. The script scans Veeva and MI packages in the directory, opens each as a web page, captures an image, resizes it, and saves it as a thumbnail using libraries such as Puppeteer and Jimp.
 
