@@ -8,7 +8,9 @@ This Node.js script automatically generates thumbnails for Veeva and MI packages
 
 2. To run the script, use the following command:
 
-   sh install.sh
+``` bash
+sh install.sh
+```
 
 Example usage:
 
