@@ -12,9 +12,9 @@ This Node.js script automatically generates thumbnails for Veeva and MI packages
 
 Example usage:
 
-vthumb (Veeva)
-sthumb (Veeva)
-mithumb (MI)
+- vthumb (Veeva)
+- sthumb (Veeva)
+- mithumb (MI)
 
 This commands will scan Veeva and MI packages in the current directory and create a thumbnail for each package.
 
